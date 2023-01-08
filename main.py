@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
-import tensorflow
 from tkcalendar import Calendar, DateEntry
 from tkinter.scrolledtext import *
+from tkinter import messagebox
 
 # Database
 import sqlite3
@@ -18,7 +18,7 @@ def creatTable():
         'CREATE TABLE IF NOT EXIST userdata(firstName TEXT, lastName TEXT, email TEXT, age TEXT, dob TEXT, address TEXT, phoneNumber REAL)')
 
 
-def add(firstName, lastName, email, age, dob, address, phoneNumber):
+def addData(firstName, lastName, email, age, dob, address, phoneNumber):
     c.execute('INSERT INTO userdata(firstName, lastName, email, age, dob, address, phoneNumber) VALUES (?,?,?,?,?,?,?)',
               (firstName, lastName, email, age, dob, address, phoneNumber))
     conn.commit()
@@ -32,7 +32,8 @@ def viewAllUsers():
 
 
 def getSingleUser(firstName):
-    c.execute(f'SELECT * FROM userdata WHERE firstName = "{}"'.format(firstName))
+    c.execute(f'SELECT * FROM userdata WHERE firstName = "{firstName}"')
+    # c.execute(f'SELECT * FROM userdata WHERE firstName = "{firstName}"'.format(firstName))
     data = c.fetchall()
     return data
 
@@ -42,9 +43,48 @@ def clearText():
     lName.delete('0', END)
     eMail.delete('0', END)
     age.delete('0', END)
-    # dob.delete('0', END)
+    dob.delete('0', END)
     add.delete('0', END)
     phone.delete('0', END)
+
+
+def add():
+    firstname = str(fName.get())
+    lastname = str(lName.get())
+    mail = str(eMail.get())
+    ag = str(age.get())
+    date = str(dob.get())
+    addr = str(add.get())
+    number = str(phone.get())
+    addData(firstname, lastname, mail, ag, date, addr, number)
+    result = "\nFirst Name:{}, \nLast Name:{}, \nEmail:{}, \nAge:{}, \nDate of Birth:{}, \nAddress:{}, \nPhone Number:{}"
+    homeDisplay.insert(END, result)
+    messagebox.showinfo("Success", "Record added to database successfully!")
+
+
+def clearDisp():
+    homeDisplay.delete("1.0", END)
+
+
+def searchUser():
+    firstname = str(fName.get())
+    result = getSingleUser(firstname)
+    # c.execute(f'SELECT * FROM userdata WHERE firstName = "{firstName}"')
+    # data = c.fetchall()
+    # print(data)
+    searchDisplay.insert(END, result)
+
+
+def clearSearch():
+    seach.delete("0", END)
+
+
+def clearResult():
+    searchDisplay.delete("1.0", END)
+
+
+def clearTable():
+    tree.delete("1.0", END)
 
 
 # Structure and Layout
@@ -140,7 +180,7 @@ clear.grid(row=8, column=1, padx=5, pady=5)
 homeDisplay = ScrolledText(home, height=5)
 homeDisplay.grid(row=9, column=0, padx=5, pady=5, columnspan=3)
 
-clearDisplay = Button(home, text="Clear Submission", width=12, bg="green", fg="white")
+clearDisplay = Button(home, text="Clear Submission", width=12, bg="green", fg="white", command=clearDisp)
 clearDisplay.grid(row=10, column=1, padx=10, pady=10)
 
 # View page
@@ -156,6 +196,9 @@ tree.heading("#5", text="Date of Birth")
 tree.heading("#6", text="Address")
 tree.heading("#7", text="Phone Number")
 tree.grid(row=10, column=0, columnspan=3, padx=5, pady=5)
+
+clearTree = Button(view, text="Clear Table", width=12, bg="green", fg="white", command=clearTable)
+clearTree.grid(row=1, column=1, padx=10, pady=10)
 
 # Search page
 sc = Label(search, text="Search by Name", padx=5, pady=5)
