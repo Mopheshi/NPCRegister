@@ -254,5 +254,7 @@ toExcel = Button(export, text="Export Excel", width=12, bg="green", fg="white", 
 toExcel.grid(row=3, column=1, padx=10, pady=10)
 
 # About page
+about = Label(about, text="NPC Register v1.0.0\nMorpheus Softwares", padx=5, pady=5)
+about.grid(row=1, column=0)
 
 window.mainloop()
