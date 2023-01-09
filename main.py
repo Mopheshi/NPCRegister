@@ -1,24 +1,25 @@
+import csv
+import sqlite3
 import tkinter as tk
 from tkinter import *
-from tkinter import ttk
-from tkcalendar import Calendar, DateEntry
-from tkinter.scrolledtext import *
 from tkinter import messagebox
+from tkinter import ttk
+from tkinter.scrolledtext import *
+
+from tkcalendar import DateEntry
 
 # Database
-import sqlite3
-import csv
-
 conn = sqlite3.connect("npcregister.db")
 c = conn.cursor()
 
 
 def creatTable():
     c.execute(
-        'CREATE TABLE IF NOT EXIST userdata(firstName TEXT, lastName TEXT, email TEXT, age TEXT, dob TEXT, address TEXT, phoneNumber REAL)')
+        'CREATE TABLE IF NOT EXISTS userdata(firstName TEXT, lastName TEXT, email TEXT, age TEXT, dob TEXT, '
+        'address TEXT, phoneNumber REAL)')
 
 
-def addData(firstName, lastName, email, age, dob, address, phoneNumber):
+def addDetails(firstName, lastName, email, age, dob, address, phoneNumber):
     c.execute('INSERT INTO userdata(firstName, lastName, email, age, dob, address, phoneNumber) VALUES (?,?,?,?,?,?,?)',
               (firstName, lastName, email, age, dob, address, phoneNumber))
     conn.commit()
@@ -31,8 +32,8 @@ def viewAllUsers():
         tree.insert("", tk.END, values=row)
 
 
-def getSingleUser(firstName):
-    c.execute(f'SELECT * FROM userdata WHERE firstName = "{firstName}"')
+def getSingleUser(firstname):
+    c.execute(f'SELECT * FROM userdata WHERE firstName = "{firstname}"')
     # c.execute(f'SELECT * FROM userdata WHERE firstName = "{firstName}"'.format(firstName))
     data = c.fetchall()
     return data
@@ -44,20 +45,21 @@ def clearText():
     eMail.delete('0', END)
     age.delete('0', END)
     dob.delete('0', END)
-    add.delete('0', END)
+    addre.delete('0', END)
     phone.delete('0', END)
 
 
-def add():
+def addData():
     firstname = str(fName.get())
     lastname = str(lName.get())
     mail = str(eMail.get())
     ag = str(age.get())
     date = str(dob.get())
-    addr = str(add.get())
+    addr = str(addre.get())
     number = str(phone.get())
-    addData(firstname, lastname, mail, ag, date, addr, number)
-    result = "\nFirst Name:{}, \nLast Name:{}, \nEmail:{}, \nAge:{}, \nDate of Birth:{}, \nAddress:{}, \nPhone Number:{}"
+    addDetails(firstname, lastname, mail, ag, date, addr, number)
+    result = f"First Name:{firstname}, \nLast Name:{lastname}, \nEmail:{mail}, \nAge:{ag}, \nDate of Birth:{date}, " \
+             f"\nAddress:{addr}, \nPhone Number:{number} "
     homeDisplay.insert(END, result)
     messagebox.showinfo("Success", "Record added to database successfully!")
 
@@ -67,7 +69,7 @@ def clearDisp():
 
 
 def searchUser():
-    firstname = str(fName.get())
+    firstname = str(seach.get())
     result = getSingleUser(firstname)
     # c.execute(f'SELECT * FROM userdata WHERE firstName = "{firstName}"')
     # data = c.fetchall()
@@ -84,13 +86,28 @@ def clearResult():
 
 
 def clearTable():
-    tree.delete("1.0", END)
+    tree.delete("1.0", tk.END)
+
+
+def exportCSV():
+    file = str(fileName.get()) + ".csv"
+    with open(file, 'w') as f:
+        writer = csv.writer(f)
+        c.execute('SELECT * FROM userdata')
+        data = c.fetchall()
+        writer.writerow(['First Name', 'Last Name', 'Email', 'Age', 'Date of Birth', 'Address', 'Phone Number'])
+        writer.writerows(data)
+        messagebox.showinfo("Success", f"{file} exported successfully!")
+
+
+def exportExcel():
+    pass
 
 
 # Structure and Layout
 window = Tk()
 window.title("NPC Register")
-window.geometry("800x450")
+window.geometry("1080x500")
 
 style = ttk.Style(window)
 style.configure("lefttab.TNotebook", tabposition="wn")
@@ -111,6 +128,8 @@ tabControl.add(export, text=f'{"Export":^20s}')
 tabControl.add(about, text=f'{"About":^20s}')
 
 tabControl.pack(expand=1, fill="both")
+
+creatTable()
 
 label1 = Label(home, text="NPC Register", padx=5, pady=5)
 label1.grid(row=0, column=0)
@@ -161,8 +180,8 @@ dob.grid(row=5, column=1, padx=10, pady=10)
 ad = Label(home, text="Address", padx=5, pady=5)
 ad.grid(row=6, column=0)
 address = StringVar()
-add = Entry(home, textvariable=address, width=50)
-add.grid(row=6, column=1)
+addre = Entry(home, textvariable=address, width=50)
+addre.grid(row=6, column=1)
 
 pn = Label(home, text="Phone Number", padx=5, pady=5)
 pn.grid(row=7, column=0)
@@ -170,14 +189,14 @@ phoneNumber = StringVar()
 phone = Entry(home, textvariable=phoneNumber, width=50)
 phone.grid(row=7, column=1)
 
-add = Button(home, text="Add", width=12, bg="green", fg="white")
+add = Button(home, text="Add", width=12, bg="green", fg="white", command=addData)
 add.grid(row=8, column=0, padx=5, pady=5)
 
-clear = Button(home, text="Clear", width=12, bg="green", fg="white")
+clear = Button(home, text="Clear", width=12, bg="green", fg="white", command=clearText)
 clear.grid(row=8, column=1, padx=5, pady=5)
 
 # Display Screen
-homeDisplay = ScrolledText(home, height=5)
+homeDisplay = ScrolledText(home, height=10)
 homeDisplay.grid(row=9, column=0, padx=5, pady=5, columnspan=3)
 
 clearDisplay = Button(home, text="Clear Submission", width=12, bg="green", fg="white", command=clearDisp)
@@ -217,11 +236,22 @@ clearResult = Button(search, text="Clear Results", width=12, bg="green", fg="whi
 clearResult.grid(row=2, column=2, padx=10, pady=10)
 
 # Display Screen
-searchDisplay = ScrolledText(search, height=5)
-searchDisplay = Listbox(search, width=60, height=5)
+searchDisplay = ScrolledText(search, height=10)
+# searchDisplay = Listbox(search, width=60, height=5)
 searchDisplay.grid(row=10, column=0, padx=5, pady=5, columnspan=3)
 
 # Export page
+ex = Label(export, text="File Name", padx=5, pady=5)
+ex.grid(row=2, column=0)
+filename = StringVar()
+fileName = Entry(export, textvariable=filename, width=30)
+fileName.grid(row=2, column=1)
+
+toCSV = Button(export, text="Export CSV", width=12, bg="green", fg="white", command=exportCSV)
+toCSV.grid(row=3, column=0, padx=10, pady=10)
+
+toExcel = Button(export, text="Export Excel", width=12, bg="green", fg="white", command=exportExcel)
+toExcel.grid(row=3, column=1, padx=10, pady=10)
 
 # About page
 
