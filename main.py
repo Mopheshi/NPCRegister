@@ -15,13 +15,14 @@ c = conn.cursor()
 
 def creatTable():
     c.execute(
-        'CREATE TABLE IF NOT EXISTS userdata(firstName TEXT, lastName TEXT, email TEXT, age TEXT, dob TEXT, '
-        'address TEXT, phoneNumber REAL)')
+        'CREATE TABLE IF NOT EXISTS userdata(FileNumber TEXT, DepartmentFrom TEXT, DepartmentTo TEXT, TransitionColumn TEXT, Date TEXT, '
+        'SubjectMatter TEXT, StaffNumber REAL)')
 
 
-def addDetails(firstName, lastName, email, age, dob, address, phoneNumber):
-    c.execute('INSERT INTO userdata(firstName, lastName, email, age, dob, address, phoneNumber) VALUES (?,?,?,?,?,?,?)',
-              (firstName, lastName, email, age, dob, address, phoneNumber))
+def addDetails(fileNumber, departmentFrom, departmentTo, transitionColumn, date, subjectMatter, staffNumber):
+    c.execute('INSERT INTO userdata(fileNumber, departmentFrom, departmentTo, transitionColumn, date, subjectMatter, '
+              'staffNumber) VALUES (?,?,?,?,?,?,?)',
+              (fileNumber, departmentFrom, departmentTo, transitionColumn, date, subjectMatter, staffNumber))
     conn.commit()
 
 
@@ -32,34 +33,34 @@ def viewAllUsers():
         tree.insert("", tk.END, values=row)
 
 
-def getSingleUser(firstname):
-    c.execute(f'SELECT * FROM userdata WHERE firstName = "{firstname}"')
-    # c.execute(f'SELECT * FROM userdata WHERE firstName = "{firstName}"'.format(firstName))
+def getSingleUser(fileNumber):
+    c.execute(f'SELECT * FROM userdata WHERE firstName = "{fileNumber}"')
+    # c.execute(f'SELECT * FROM userdata WHERE firstName = "{fileNumber}"'.format(fileNumber))
     data = c.fetchall()
     return data
 
 
 def clearText():
-    fName.delete('0', END)
-    lName.delete('0', END)
-    eMail.delete('0', END)
-    age.delete('0', END)
-    dob.delete('0', END)
-    addre.delete('0', END)
-    phone.delete('0', END)
+    fileNumber.delete('0', END)
+    departmentFrom.delete('0', END)
+    departmentTo.delete('0', END)
+    transitionColumn.delete('0', END)
+    date.delete('0', END)
+    subjectMatter.delete('0', END)
+    staffNumber.delete('0', END)
 
 
 def addData():
-    firstname = str(fName.get())
-    lastname = str(lName.get())
-    mail = str(eMail.get())
-    ag = str(age.get())
-    date = str(dob.get())
-    addr = str(addre.get())
-    number = str(phone.get())
-    addDetails(firstname, lastname, mail, ag, date, addr, number)
-    result = f"First Name:{firstname}, \nLast Name:{lastname}, \nEmail:{mail}, \nAge:{ag}, \nDate of Birth:{date}, " \
-             f"\nAddress:{addr}, \nPhone Number:{number} "
+    fileN = str(fileNumber.get())
+    deptF = str(departmentFrom.get())
+    deptT = str(departmentTo.get())
+    trans = str(transitionColumn.get())
+    d = str(date.get())
+    sub = str(subjectMatter.get())
+    num = str(staffNumber.get())
+    addDetails(fileN, deptF, deptT, trans, d, sub, num)
+    result = f"File Number:{fileN}, \nDepartment From:{deptF}, \nDepartment To:{deptT}, \nTransition Column:{trans}, \nDate:{d}, " \
+             f"\nSubject Matter:{sub}, \nStaff Number:{num} "
     homeDisplay.insert(END, result)
     messagebox.showinfo("Success", "Record added to database successfully!")
 
@@ -69,8 +70,8 @@ def clearDisp():
 
 
 def searchUser():
-    firstname = str(seach.get())
-    result = getSingleUser(firstname)
+    fileNumber = str(seach.get())
+    result = getSingleUser(fileNumber)
     # c.execute(f'SELECT * FROM userdata WHERE firstName = "{firstName}"')
     # data = c.fetchall()
     # print(data)
@@ -86,7 +87,9 @@ def clearResult():
 
 
 def clearTable():
-    tree.delete("1.0", tk.END)
+    for item in tree.get_children():
+        tree.delete(item)
+    messagebox.showinfo("Clear", "Table cleared!")
 
 
 def exportCSV():
@@ -95,7 +98,9 @@ def exportCSV():
         writer = csv.writer(f)
         c.execute('SELECT * FROM userdata')
         data = c.fetchall()
-        writer.writerow(['First Name', 'Last Name', 'Email', 'Age', 'Date of Birth', 'Address', 'Phone Number'])
+        writer.writerow(
+            ['File Number', 'Department From', 'Department To', 'Transition Column', 'Date', 'Subject Matter',
+             'Staff Number'])
         writer.writerows(data)
         messagebox.showinfo("Success", f"{file} exported successfully!")
 
@@ -107,7 +112,7 @@ def exportExcel():
 # Structure and Layout
 window = Tk()
 window.title("NPC Register")
-window.geometry("1080x500")
+window.geometry("1080x600")
 
 style = ttk.Style(window)
 style.configure("lefttab.TNotebook", tabposition="wn")
@@ -147,52 +152,51 @@ label5 = Label(about, text="About", padx=5, pady=5)
 label5.grid(row=0, column=0)
 
 # Home page
-fn = Label(home, text="First Name", padx=5, pady=5)
+fn = Label(home, text="File Number", padx=5, pady=5)
 fn.grid(row=1, column=0)
-firstName = StringVar()
-fName = Entry(home, textvariable=firstName, width=50)
-fName.grid(row=1, column=1)
+fileNum = StringVar()
+fileNumber = Entry(home, textvariable=fileNum, width=50)
+fileNumber.grid(row=1, column=1)
 
-ln = Label(home, text="Last Name", padx=5, pady=5)
-ln.grid(row=2, column=0)
-lastName = StringVar()
-lName = Entry(home, textvariable=lastName, width=50)
-lName.grid(row=2, column=1)
+df = Label(home, text="Department From", padx=5, pady=5)
+df.grid(row=2, column=0)
+deptFrom = StringVar()
+departmentFrom = Entry(home, textvariable=deptFrom, width=50)
+departmentFrom.grid(row=2, column=1)
 
-em = Label(home, text="Email", padx=5, pady=5)
-em.grid(row=3, column=0)
-email = StringVar()
-eMail = Entry(home, textvariable=email, width=50)
-eMail.grid(row=3, column=1)
+yd = Label(home, text="Department To", padx=5, pady=5)
+yd.grid(row=3, column=0)
+deptTo = StringVar()
+departmentTo = Entry(home, textvariable=deptTo, width=50)
+departmentTo.grid(row=3, column=1)
 
-ag = Label(home, text="Age", padx=5, pady=5)
-ag.grid(row=4, column=0)
-Age = IntVar()
-age = Entry(home, textvariable=Age, width=50)
-age.grid(row=4, column=1)
+tc = Label(home, text="Transition Column", padx=5, pady=5)
+tc.grid(row=4, column=0)
+transColumn = StringVar()
+transitionColumn = Entry(home, textvariable=transColumn, width=50)
+transitionColumn.grid(row=4, column=1)
 
-db = Label(home, text="Date of Birth", padx=5, pady=5)
-db.grid(row=5, column=0)
-DOB = StringVar()
-dob = DateEntry(home, textvariable=DOB, background="green", foreground="white", borderwidth=2, year=2010)
-dob.grid(row=5, column=1, padx=10, pady=10)
+dt = Label(home, text="Date", padx=5, pady=5)
+dt.grid(row=5, column=0)
+day = StringVar()
+date = DateEntry(home, textvariable=day, background="green", foreground="white", borderwidth=2, year=2023)
+date.grid(row=5, column=1, padx=10, pady=10)
 
-ad = Label(home, text="Address", padx=5, pady=5)
-ad.grid(row=6, column=0)
-address = StringVar()
-addre = Entry(home, textvariable=address, width=50)
-addre.grid(row=6, column=1)
+sb = Label(home, text="Subject Matter", padx=5, pady=5)
+sb.grid(row=6, column=0)
+subjectMatter = ScrolledText(home, width=50, height=5)
+subjectMatter.grid(row=6, column=1, padx=5, pady=5, columnspan=3)
 
-pn = Label(home, text="Phone Number", padx=5, pady=5)
-pn.grid(row=7, column=0)
-phoneNumber = StringVar()
-phone = Entry(home, textvariable=phoneNumber, width=50)
-phone.grid(row=7, column=1)
+sn = Label(home, text="Staff Number", padx=5, pady=5)
+sn.grid(row=7, column=0)
+staffNum = StringVar()
+staffNumber = Entry(home, textvariable=staffNum, width=50)
+staffNumber.grid(row=7, column=1)
 
-add = Button(home, text="Add", width=12, bg="green", fg="white", command=addData)
+add = Button(home, text="Add Record", width=12, bg="green", fg="white", command=addData)
 add.grid(row=8, column=0, padx=5, pady=5)
 
-clear = Button(home, text="Clear", width=12, bg="green", fg="white", command=clearText)
+clear = Button(home, text="Clear Entries", width=12, bg="green", fg="white", command=clearText)
 clear.grid(row=8, column=1, padx=5, pady=5)
 
 # Display Screen
@@ -207,13 +211,13 @@ viewAll = Button(view, text="View All", width=12, bg="green", fg="white", comman
 viewAll.grid(row=1, column=0, padx=10, pady=10)
 tree = ttk.Treeview(view, column=("column1", "column2", "column3", "column4", "column5", "column6", "column7"),
                     show="headings")
-tree.heading("#1", text="First Name")
-tree.heading("#2", text="Last Name")
-tree.heading("#3", text="Email")
-tree.heading("#4", text="Age")
-tree.heading("#5", text="Date of Birth")
-tree.heading("#6", text="Address")
-tree.heading("#7", text="Phone Number")
+tree.heading("#1", text="File Number")
+tree.heading("#2", text="Department From")
+tree.heading("#3", text="Department To")
+tree.heading("#4", text="Transition Column")
+tree.heading("#5", text="Date")
+tree.heading("#6", text="Subject Matter")
+tree.heading("#7", text="Staff Number")
 tree.grid(row=10, column=0, columnspan=3, padx=5, pady=5)
 
 clearTree = Button(view, text="Clear Table", width=12, bg="green", fg="white", command=clearTable)
