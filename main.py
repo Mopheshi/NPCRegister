@@ -56,7 +56,7 @@ def addData():
     deptT = str(departmentTo.get())
     trans = str(transitionColumn.get())
     d = str(date.get())
-    sub = str(subjectMatter.get())
+    sub = str(subjectMatter.get('0', END))
     num = str(staffNumber.get())
     addDetails(fileN, deptF, deptT, trans, d, sub, num)
     result = f"File Number:{fileN}, \nDepartment From:{deptF}, \nDepartment To:{deptT}, \nTransition Column:{trans}, \nDate:{d}, " \
