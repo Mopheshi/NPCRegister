@@ -136,7 +136,7 @@ tabControl.pack(expand=1, fill="both")
 
 creatTable()
 
-label1 = Label(home, text="NPC Register", padx=5, pady=5)
+label1 = Label(home, text="Home", padx=5, pady=5)
 label1.grid(row=0, column=0)
 
 label2 = Label(view, text="View", padx=5, pady=5)
