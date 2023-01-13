@@ -34,7 +34,7 @@ def viewAllUsers():
 
 
 def getSingleUser(fileNumber):
-    c.execute(f'SELECT * FROM userdata WHERE firstName = "{fileNumber}"')
+    c.execute(f'SELECT * FROM userdata WHERE fileNumber = "{fileNumber}"')
     # c.execute(f'SELECT * FROM userdata WHERE firstName = "{fileNumber}"'.format(fileNumber))
     data = c.fetchall()
     return data
