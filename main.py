@@ -56,7 +56,7 @@ def addData():
     deptT = str(departmentTo.get())
     trans = str(transitionColumn.get())
     d = str(date.get())
-    sub = str(subjectMatter.get('0', END))
+    sub = str(subjectMatter.get(1.0, "end-1c"))
     num = str(staffNumber.get())
     addDetails(fileN, deptF, deptT, trans, d, sub, num)
     result = f"File Number:{fileN}, \nDepartment From:{deptF}, \nDepartment To:{deptT}, \nTransition Column:{trans}, \nDate:{d}, " \
@@ -184,8 +184,9 @@ date.grid(row=5, column=1, padx=10, pady=10)
 
 sb = Label(home, text="Subject Matter", padx=5, pady=5)
 sb.grid(row=6, column=0)
-subjectMatter = ScrolledText(home, width=50, height=5)
-subjectMatter.grid(row=6, column=1, padx=5, pady=5, columnspan=3)
+subject = StringVar()
+subjectMatter = Text(home, wrap="word", width=37, height=5)
+subjectMatter.grid(row=6, column=1)
 
 sn = Label(home, text="Staff Number", padx=5, pady=5)
 sn.grid(row=7, column=0)
